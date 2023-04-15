@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -52,6 +53,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   var image = null;
+  var loading = false;
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
@@ -64,7 +66,8 @@ class _MyHomePageState extends State<MyHomePage> {
         appBar: AppBar(
           // Here we take the value from the MyHomePage object that was created by
           // the App.build method, and use it to set our appbar title.
-          title: Text(widget.title),
+          title: Text(widget.title, style: TextStyle(color: Colors.black),),
+          backgroundColor: Colors.brown,
         ),
         body: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -93,17 +96,22 @@ class _MyHomePageState extends State<MyHomePage> {
                   Container(
                     width: MediaQuery.of(context).size.width * 0.9,
                     height: MediaQuery.of(context).size.width * 0.9,
-                    color: Colors.black,
+                    color: Colors.grey,
                     child: image != null
                         ? Image.file(File(image.path))
-                        : const Text(
-                            "Place Image",
-                            style: TextStyle(color: Colors.white),
-                            textAlign: TextAlign.center,
-                          ),
+                        : Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text(
+                                "Place Image",
+                                style: TextStyle(color: Colors.white, fontSize: 30),
+                                textAlign: TextAlign.center,
+                              ),
+                          ],
+                        ),
                   ),
                   image != null
-                      ? Text('normal Lens', style: TextStyle(fontSize: 20, color: Colors.blue),)
+                      ? loading ? Text('normal Lens', style: TextStyle(fontSize: 20, color: Colors.blue)) : Text('Analyzing...', style: TextStyle(fontSize: 20, color: Colors.blue) ,)
                       : const SizedBox(
                           height: 20,
                         ),
@@ -115,17 +123,25 @@ class _MyHomePageState extends State<MyHomePage> {
                         var picker = ImagePicker();
                         image =
                             await picker.pickImage(source: ImageSource.gallery);
+                            print(image.path);
                         if (image != null) {
-                          setState(() {});
-                          print(image.path);
+                          setState(() {loading = false;});
+                          Timer(Duration(seconds: 2), () => { 
+                            setState((){
+                              loading = true;
+                            })
+                          });
                         }
                       },
                       child: Container(
                         width: 200,
-                        height: MediaQuery.of(context).size.height * 0.02,
+                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(10),
+                        color: Colors.lightBlueAccent,),
+                        padding: EdgeInsets.all(10.0),
                         child: const Text(
                           'Choose Image',
                           textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 20, color: Colors.white),
                         ),
                       ))
                 ],
